@@ -1,7 +1,8 @@
 import mongoose, { connect, ConnectOptions } from "mongoose";
 import { NextApiRequest, NextApiResponse } from "next";
+import config from "./config";
 
-const MONGO_URL = process.env.MONGO_URL as string;
+const MONGO_URL = config.MONGO_URL;
 
 if (!MONGO_URL) {
   throw new Error("MONGO_URL must be defined in environment");
