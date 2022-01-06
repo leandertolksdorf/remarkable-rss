@@ -39,10 +39,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         }
         return res.status(status).json({ success: false });
       }
-
       break;
   }
-  res.status(200).send("OK");
 }
 
 export default withDatabase(handler);
