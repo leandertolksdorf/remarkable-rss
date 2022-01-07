@@ -40,7 +40,7 @@ const handlers: handlers = {
         path: "/",
       })
     );
-    return res.status(201).json({ success: true });
+    return res.status(200).json({ success: true });
   },
 };
 
