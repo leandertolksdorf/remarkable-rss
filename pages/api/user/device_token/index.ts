@@ -34,11 +34,6 @@ const handlers: handlers = {
 
     const client = new Remarkable();
     const deviceToken = await client.register({ code: oneTimeCode });
-    await client.refreshToken();
-    const directoryId = await client.createDirectory(
-      "remarkable-rss", // directory name
-      "remarkable-rss" // directory id
-    );
 
     user.deviceToken = deviceToken;
     user.save();
