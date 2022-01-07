@@ -20,8 +20,8 @@ const Account: NextPage = () => {
       });
       switch (response.status) {
         case 200:
-          const user = await response.json();
-          setUser(user);
+          const json = await response.json();
+          setUser(json.user);
           break;
         default:
           router.push("/");

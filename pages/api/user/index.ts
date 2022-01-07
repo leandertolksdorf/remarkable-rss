@@ -27,7 +27,7 @@ const handlers: handlers = {
       hasDeviceToken: user.deviceToken !== null,
       feeds: user.feeds,
     };
-    return res.status(200).json(response);
+    return res.status(200).json({ success: true, user: response });
   },
   POST: async (req: NextApiRequest, res: NextApiResponse) => {
     const { body } = req;
