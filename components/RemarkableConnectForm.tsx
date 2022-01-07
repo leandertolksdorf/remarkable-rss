@@ -1,12 +1,42 @@
 import classNames from "classnames";
+import { useRouter } from "next/router";
 import { useState } from "react";
 import Button from "./Button";
 import TextInput from "./TextInput";
 
 function RemarkableConnectForm() {
-  const [oneTimeCode, setOneTimeCode] = useState("");
+  const router = useRouter();
 
-  const handleConnectAccount = () => {};
+  const [oneTimeCode, setOneTimeCode] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleConnectAccount = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch("/api/user/device_token", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ oneTimeCode }),
+      });
+      setLoading(false);
+      switch (response.status) {
+        case 201:
+          router.reload();
+          break;
+        case 400:
+          setError("Invalid one-time code");
+          break;
+        default:
+          setError("Server Error");
+          break;
+      }
+    } catch (e: any) {
+      console.log(e);
+    }
+  };
 
   return (
     <div>
@@ -27,7 +57,11 @@ function RemarkableConnectForm() {
         value={oneTimeCode}
         onChange={(e) => setOneTimeCode((e.target as HTMLInputElement).value)}
       />
-      <Button label="connect" onClick={handleConnectAccount} />
+      <Button
+        label={loading ? "loading... (this could take a while)" : "connect"}
+        onClick={handleConnectAccount}
+      />
+      <p className={classNames("my-2", "text-red-700", "text-sm")}>{error}</p>
     </div>
   );
 }
