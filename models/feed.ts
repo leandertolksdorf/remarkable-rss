@@ -7,10 +7,12 @@ export interface IFeed extends mongoose.Document {
 }
 
 export const FeedSchema = new mongoose.Schema<IFeed>({
-  url: { type: String, required: true, unique: true },
+  url: { type: String, required: true },
   title: { type: String, required: true },
   lastParsed: Date,
 });
 
-export const FeedModel: mongoose.Model<IFeed> =
+const FeedModel: mongoose.Model<IFeed> =
   mongoose.models.Feed || mongoose.model("Feed", FeedSchema);
+
+export default FeedModel;
