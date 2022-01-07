@@ -58,13 +58,15 @@ const Account: NextPage = () => {
       ) : (
         <RemarkableConnectForm />
       )}
-      <a
-        href="#"
-        onClick={handleLogout}
-        className={classNames("inline-block", "mt-5", "text-indigo-500")}
-      >
-        logout
-      </a>
+      <div className={classNames("mt-5")}>
+        <a
+          href="#"
+          onClick={handleLogout}
+          className={classNames("text-indigo-500")}
+        >
+          logout
+        </a>
+      </div>
     </Layout>
   );
 };
