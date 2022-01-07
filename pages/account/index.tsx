@@ -1,7 +1,9 @@
+import classNames from "classnames";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import Layout from "../../components/Layout";
+import RemarkableConnectForm from "../../components/RemarkableConnectForm";
 
 const Account: NextPage = () => {
   const router = useRouter();
@@ -30,18 +32,39 @@ const Account: NextPage = () => {
     }
   };
 
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/user/logout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      router.push("/");
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   useEffect(() => {
     getCurrentUser();
   }, []);
 
   return (
     <Layout loading={!user}>
-      <p>Welcome {user?.username}!</p>
-      <p>
-        {user?.hasDeviceToken
-          ? "Your reMarkable account is connected!"
-          : "Connect your reMarkable account to get started!"}
-      </p>
+      <p className={classNames("mb-2")}>Welcome {user?.username}!</p>
+      {user?.hasDeviceToken ? (
+        "Your reMarkable account is connected!"
+      ) : (
+        <RemarkableConnectForm />
+      )}
+      <a
+        href="#"
+        onClick={handleLogout}
+        className={classNames("inline-block", "mt-5", "text-indigo-500")}
+      >
+        logout
+      </a>
     </Layout>
   );
 };
