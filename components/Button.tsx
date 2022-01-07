@@ -17,7 +17,8 @@ function Button(props: Props) {
         "mb-1",
         "bg-black",
         "text-white",
-        "select-none"
+        "select-none",
+        "active:bg-indigo-500"
       )}
     >
       {props.label}
