@@ -1,11 +1,11 @@
-import mongoose from "mongoose";
+import mongoose, { Types } from "mongoose";
 import { FeedSchema, IFeed } from "./feed";
 
 export interface IUser extends mongoose.Document {
   username: string;
   password: string;
   deviceToken: string | null;
-  feeds: IFeed[];
+  feeds: Types.DocumentArray<IFeed>;
 }
 
 export const UserSchema = new mongoose.Schema<IUser>({
