@@ -24,7 +24,7 @@ function buildRouteHandler(handlers: handlers) {
       let status;
       if (e instanceof ValidationError) {
         status = 400;
-      } else if (e.code === 11000) {
+      } else if (e.code === 11000 || e.message === "409") {
         status = 409;
       } else if (e.message === "404") {
         status = 404;
