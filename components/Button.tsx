@@ -10,24 +10,26 @@ type Props = {
 
 function Button(props: Props) {
   return (
-    <Link href={props.href || "#"}>
-      <div
-        onClick={props.onClick}
-        className={classNames(
-          "cursor-pointer",
-          "w-full",
-          "p-2",
-          "mb-2",
-          "bg-black",
-          "text-white",
-          "select-none",
-          "active:bg-indigo-500",
-          "border",
-          "border-black"
-        )}
-      >
-        {props.label}
-      </div>
+    <Link href={props.href || "#"} passHref>
+      <a>
+        <div
+          onClick={props.onClick}
+          className={classNames(
+            "cursor-pointer",
+            "w-full",
+            "p-2",
+            "mb-2",
+            "bg-black",
+            "text-white",
+            "select-none",
+            "active:bg-indigo-500",
+            "border",
+            "border-black"
+          )}
+        >
+          {props.label}
+        </div>
+      </a>
     </Link>
   );
 }

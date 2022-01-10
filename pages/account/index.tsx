@@ -50,7 +50,7 @@ const Account: NextPage = () => {
 
   useEffect(() => {
     getCurrentUser();
-  }, []);
+  });
 
   return (
     <Layout loading={!user}>

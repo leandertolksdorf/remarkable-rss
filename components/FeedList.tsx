@@ -44,8 +44,9 @@ function FeedList(props: Props) {
     <div className={classNames("mb-5")}>
       <h3 className={classNames("font-bold", "text-xl", "mb-2")}>Your Feeds</h3>
       {error && <p className={classNames("text-red-500")}>{error}</p>}
-      {props.feeds.map((feed) => (
+      {props.feeds.map((feed, i) => (
         <div
+          key={i}
           className={classNames(
             "bg-gray-100",
             "border",
