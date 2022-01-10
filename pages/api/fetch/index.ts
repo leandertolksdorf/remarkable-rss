@@ -11,6 +11,7 @@ const handlers: handlers = {
   GET: async (req: NextApiRequest, res: NextApiResponse) => {
     const { headers } = req;
     const { api_key } = headers;
+    console.log(headers);
     console.log(api_key);
     if (!(api_key === process.env.API_KEY)) {
       throw new Error("401");
