@@ -1,0 +1,11 @@
+name: Fetch feeds every 5 minutes
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+jobs:
+  fetch:
+    name: Fetch feed items and save to reMarkable cloud.
+    runs-on: ubuntu-latest
+    steps:
+      - name: cURL request
+        run: 'curl https://remarkable-rss.farbig.media/api/fetch -header "api-key: ${{ secrets.API_KEY }}"'
