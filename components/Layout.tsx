@@ -9,15 +9,7 @@ type Props = {
 
 function Layout(props: Props) {
   return (
-    <div
-      className={classNames(
-        "container",
-        "mx-auto",
-        "px-5",
-        "py-10",
-        "text-center"
-      )}
-    >
+    <div className={classNames("container", "mx-auto", "px-5", "text-center")}>
       <h1
         className={classNames(
           "font-bold",
@@ -25,7 +17,7 @@ function Layout(props: Props) {
           "flex",
           "items-center",
           "justify-center",
-          "mb-5"
+          "my-16"
         )}
       >
         <RssIcon className={classNames("h-8 w-8", "inline")} />
