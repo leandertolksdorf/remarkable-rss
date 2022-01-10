@@ -2,6 +2,8 @@ import classNames from "classnames";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import CreateFeedForm from "../../components/CreateFeedForm";
+import FeedList from "../../components/FeedList";
 import Layout from "../../components/Layout";
 import RemarkableConnectForm from "../../components/RemarkableConnectForm";
 
@@ -54,7 +56,13 @@ const Account: NextPage = () => {
     <Layout loading={!user}>
       <p className={classNames("mb-2")}>Welcome {user?.username}!</p>
       {user?.hasDeviceToken ? (
-        "Your reMarkable account is connected!"
+        <>
+          <p className={classNames("mb-5")}>
+            Your reMarkable account is connected!
+          </p>
+          <FeedList feeds={user?.feeds} />
+          <CreateFeedForm />
+        </>
       ) : (
         <RemarkableConnectForm />
       )}
