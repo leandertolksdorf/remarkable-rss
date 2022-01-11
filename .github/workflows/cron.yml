@@ -8,4 +8,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: cURL request
-        run: 'curl https://remarkable-rss.farbig.media/api/fetch -header "api-key: ${{ secrets.API_KEY }}"'
+        run: 'curl https://remarkable-rss.farbig.media/api/fetch -H "api-key: ${{ secrets.API_KEY }}"'
