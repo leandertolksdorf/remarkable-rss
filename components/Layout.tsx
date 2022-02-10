@@ -25,6 +25,18 @@ function Layout(props: Props) {
         reMarkable
       </h1>
       {props.loading ? "Loading" : props.children}
+      <div className={classNames("mt-5")}>
+        This is an open-source community project. If you find any bugs or miss
+        features, consider writing issues or creating a pull request!
+        <br />
+        <a
+          href="https://github.com/leandertolksdorf/remarkable-rss"
+          target="_blank"
+          className={classNames("text-indigo-500")}
+        >
+          Repository
+        </a>
+      </div>
     </div>
   );
 }
