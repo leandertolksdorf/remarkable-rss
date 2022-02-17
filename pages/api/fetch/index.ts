@@ -28,12 +28,14 @@ const handlers: handlers = {
 
       const remarkableItems = await remarkableClient.getAllItems();
       const remarkableRssFolder = remarkableItems.find(
-        (item) =>
-          item.VissibleName === "remarkable-rss" && item.Parent !== "trash"
+        (item) => item.ID === user.rootFolderId && item.Parent !== "trash"
       );
+
       const remarkableRssFolderId =
         remarkableRssFolder?.ID ||
         (await remarkableClient.createDirectory("remarkable-rss", uuidv4()));
+
+      user.rootFolderId = remarkableRssFolderId;
 
       const feeds = user.feeds;
       for (const feed of feeds) {

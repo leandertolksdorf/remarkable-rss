@@ -5,6 +5,7 @@ export interface IUser extends mongoose.Document {
   username: string;
   password: string;
   deviceToken: string | null;
+  rootFolderId: string | null;
   feeds: Types.DocumentArray<IFeed>;
 }
 
@@ -12,6 +13,7 @@ export const UserSchema = new mongoose.Schema<IUser>({
   username: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   deviceToken: { type: String },
+  rootFolderId: { type: String },
   feeds: [FeedSchema],
 });
 
