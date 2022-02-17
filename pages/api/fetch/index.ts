@@ -6,6 +6,7 @@ import pdf from "html-pdf";
 import UserModel from "../../../models/user";
 import { v4 as uuidv4 } from "uuid";
 import buildRouteHandler, { handlers } from "../../../util/buildRouteHandler";
+import { isAfter } from "date-fns";
 
 const handlers: handlers = {
   GET: async (req: NextApiRequest, res: NextApiResponse) => {
@@ -14,11 +15,19 @@ const handlers: handlers = {
       throw new Error("401");
     }
 
+    const stats = {
+      fetchedUsers: 0,
+      fetchedFeeds: 0,
+      fetchedArticles: 0,
+      deletedArticles: 0,
+    };
+
     const parser = new Parser();
 
     const users = await UserModel.find({ deviceToken: { $ne: null } });
 
     for (const user of users) {
+      stats.fetchedUsers++;
       if (!user.deviceToken) continue;
 
       const remarkableClient = new Remarkable({
@@ -39,15 +48,7 @@ const handlers: handlers = {
 
       const feeds = user.feeds;
       for (const feed of feeds) {
-        const parsed = await parser.parseURL(feed.url);
-        console.log(feed.lastParsed);
-
-        const itemsToConvert = parsed.items.filter(
-          (item) => new Date(item.isoDate as string) > new Date(feed.lastParsed)
-        );
-
-        feed.lastParsed = new Date();
-        if (itemsToConvert.length === 0) continue;
+        stats.fetchedFeeds++;
 
         const remarkableFeedFolder = remarkableItems.find(
           (item) =>
@@ -63,7 +64,17 @@ const handlers: handlers = {
           ));
         feed.folderId = remarkableFeedFolderId;
 
+        const parsed = await parser.parseURL(feed.url);
+
+        const itemsToConvert = parsed.items.filter((item) =>
+          isAfter(new Date(item.isoDate as string), new Date(feed.lastParsed))
+        );
+
+        feed.lastParsed = new Date();
+        if (itemsToConvert.length === 0) continue;
+
         for (const item of itemsToConvert) {
+          stats.fetchedArticles++;
           if (!item.link) continue;
           const response = await fetch(item.link);
           const rawHtml = await response.text();
@@ -107,7 +118,7 @@ const handlers: handlers = {
       await user.save();
     }
 
-    return res.status(200).json({ success: true });
+    return res.status(200).json({ success: true, ...stats });
   },
 };
 
