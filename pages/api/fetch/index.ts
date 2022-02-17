@@ -51,9 +51,9 @@ const handlers: handlers = {
 
         const remarkableFeedFolder = remarkableItems.find(
           (item) =>
-            item.VissibleName === feed.title &&
-            item.Parent === remarkableRssFolderId
+            item.ID === feed.folderId && item.Parent === remarkableRssFolderId
         );
+
         const remarkableFeedFolderId =
           remarkableFeedFolder?.ID ||
           (await remarkableClient.createDirectory(
@@ -61,6 +61,7 @@ const handlers: handlers = {
             uuidv4(),
             remarkableRssFolderId
           ));
+        feed.folderId = remarkableFeedFolderId;
 
         for (const item of itemsToConvert) {
           if (!item.link) continue;
