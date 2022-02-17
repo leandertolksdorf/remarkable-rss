@@ -6,7 +6,7 @@ import pdf from "html-pdf";
 import UserModel from "../../../models/user";
 import { v4 as uuidv4 } from "uuid";
 import buildRouteHandler, { handlers } from "../../../util/buildRouteHandler";
-import { isAfter } from "date-fns";
+import { isAfter, isBefore, subDays, subMinutes } from "date-fns";
 
 const handlers: handlers = {
   GET: async (req: NextApiRequest, res: NextApiResponse) => {
@@ -63,6 +63,19 @@ const handlers: handlers = {
             remarkableRssFolderId
           ));
         feed.folderId = remarkableFeedFolderId;
+
+        const itemsToDelete = remarkableItems.filter(
+          (item) =>
+            item.Parent === remarkableFeedFolderId &&
+            isBefore(new Date(item.ModifiedClient), subDays(new Date(), 2))
+        );
+
+        console.log(itemsToDelete);
+
+        for (let item of itemsToDelete) {
+          stats.deletedArticles++;
+          await remarkableClient.deleteItem(item.ID, item.Version);
+        }
 
         const parsed = await parser.parseURL(feed.url);
 
