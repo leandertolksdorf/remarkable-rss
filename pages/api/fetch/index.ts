@@ -2,15 +2,15 @@ import cheerio from "cheerio";
 import { NextApiRequest, NextApiResponse } from "next";
 import { Remarkable } from "remarkable-typescript";
 import Parser from "rss-parser";
-import pdf from "html-pdf";
 import UserModel from "../../../models/user";
 import { v4 as uuidv4 } from "uuid";
 import buildRouteHandler, { handlers } from "../../../util/buildRouteHandler";
+import { saveItemToRemarkable } from "../../../util/saveItemToRemarkable";
+import { getRemarkableFolderId } from "../../../util/getRemarkableFolderId";
 
 const handlers: handlers = {
   GET: async (req: NextApiRequest, res: NextApiResponse) => {
-    const { headers } = req;
-    if (!(headers["api-key"] === process.env.API_KEY)) {
+    if (!(req.headers["api-key"] === process.env.API_KEY)) {
       throw new Error("401");
     }
 
@@ -26,80 +26,39 @@ const handlers: handlers = {
       });
       await remarkableClient.refreshToken();
 
-      const remarkableItems = await remarkableClient.getAllItems();
-      const remarkableRssFolder = remarkableItems.find(
-        (item) =>
-          item.VissibleName === "remarkable-rss" && item.Parent !== "trash"
-      );
-      const remarkableRssFolderId =
-        remarkableRssFolder?.ID ||
-        (await remarkableClient.createDirectory("remarkable-rss", uuidv4()));
+      const rssFolderId = await getRemarkableFolderId({
+        name: "remarkable-rss",
+        remarkableClient,
+      });
 
-      const feeds = user.feeds;
-      for (const feed of feeds) {
+      for (const feed of user.feeds) {
         const parsed = await parser.parseURL(feed.url);
-        console.log(feed.lastParsed);
 
         const itemsToConvert = parsed.items.filter(
-          (item) => new Date(item.isoDate as string) > new Date(feed.lastParsed)
+          item => new Date(item.isoDate as string) > new Date(feed.lastParsed)
         );
 
         feed.lastParsed = new Date();
-        if (itemsToConvert.length === 0) continue;
+        if (!itemsToConvert.length) continue;
 
-        const remarkableFeedFolder = remarkableItems.find(
-          (item) =>
-            item.VissibleName === feed.title &&
-            item.Parent === remarkableRssFolderId
+        const feedFolderId = await getRemarkableFolderId({
+          name: feed.title,
+          remarkableClient,
+          parentFolderId: rssFolderId,
+        });
+
+        const savedItems = Promise.all(
+          itemsToConvert
+            .filter(item => item.link)
+            .map(
+              async item =>
+                await saveItemToRemarkable({
+                  item,
+                  remarkableClient,
+                  folderId: feedFolderId,
+                })
+            )
         );
-        const remarkableFeedFolderId =
-          remarkableFeedFolder?.ID ||
-          (await remarkableClient.createDirectory(
-            feed.title,
-            uuidv4(),
-            remarkableRssFolderId
-          ));
-
-        for (const item of itemsToConvert) {
-          if (!item.link) continue;
-          const response = await fetch(item.link);
-          const rawHtml = await response.text();
-          const $ = cheerio.load(rawHtml);
-          $(
-            [
-              "script",
-              "footer",
-              "head",
-              "svg",
-              "nav",
-              "input",
-              "button",
-              "img",
-              "*[class*=menu]",
-              "*[class*=navigation]",
-              "*[class*=nav]",
-              "*[class*=sidebar]",
-              "*[class*=recommendation]",
-              "*[class*=newsletter]",
-              "*[class*=cookie]",
-            ].join(", ")
-          ).remove();
-          const body = $.html();
-          const minified = body.replace(/>\s+|\s+</g, (m) => m.trim());
-          const pdfOptions = {
-            border: "1cm",
-          };
-          await pdf
-            .create(minified, pdfOptions)
-            .toBuffer(async function (err, buffer) {
-              const pdfUploadedId = await remarkableClient.uploadPDF(
-                item.title as string,
-                uuidv4(),
-                buffer,
-                remarkableFeedFolderId
-              );
-            });
-        }
       }
       await user.save();
     }
